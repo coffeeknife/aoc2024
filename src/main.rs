@@ -12,6 +12,7 @@ fn main() {
     let args = Cli::parse();
     match args.day {
         1 => days::day1::day1(args.input),
+        2 => days::day2::day2(args.input),
         _ => {
             println!("Day not recognized or implemented");
         }

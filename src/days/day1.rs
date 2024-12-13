@@ -3,6 +3,7 @@ use std::{fs::File, io::{self, BufRead}, path::Path, collections::HashMap};
 use itertools::Itertools;
 
 pub fn day1(input: String) {
+    println!("[RUNNING DAY 1]");
     let (left, right) = parse_input(input);
     let mut part1: u64 = 0;
     let mut part2: u64 = 0;
