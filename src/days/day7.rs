@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::format, fs::File, io::{BufRead, BufReader}, path::Path};
+use std::{collections::HashMap, fs::File, io::{BufRead, BufReader}, path::Path};
 
 use itertools::Itertools;
 
