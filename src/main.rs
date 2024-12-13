@@ -13,6 +13,7 @@ fn main() {
     match args.day {
         1 => days::day1::day1(args.input),
         2 => days::day2::day2(args.input),
+        3 => days::day3::day3(args.input),
         _ => {
             println!("Day not recognized or implemented");
         }
