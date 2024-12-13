@@ -17,6 +17,7 @@ fn main() {
         4 => days::day4::day4(args.input),
         5 => days::day5::day5(args.input),
         6 => days::day6::day6(args.input),
+        7 => days::day7::day7(args.input),
         _ => {
             println!("Day not recognized or implemented");
         }
