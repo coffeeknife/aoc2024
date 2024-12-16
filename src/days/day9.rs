@@ -23,7 +23,6 @@ pub fn day9(input: String) {
     set_progress_bar_action("Solving Part 1", Color::Blue, Style::Bold);
     loop {
         if !disk.contains(&String::from(".")) { break; }
-        while disk[disk.len() - 1].eq(".") { disk.pop(); inc_progress_bar(); }
         let mut cur = disk.len() - 1;
         let cur_block = disk[cur].clone();
         while disk[cur] == cur_block && cur > 0 { cur -= 1; inc_progress_bar(); }
@@ -33,15 +32,12 @@ pub fn day9(input: String) {
         for i in 0..disk.len() {
             if block_len == 0 { break; }
             if disk[i].eq(".") {
-                disk[i] = cur_block.to_string();
+                disk[i] = cur_block.clone();
                 block_len -= 1;
                 moved_count += 1;
             }
         }
-        for i in disk.len() - moved_count..disk.len() {
-            disk[i] = String::from(".");
-            inc_progress_bar();
-        }
+        while (disk[disk.len() - 1].eq(&cur_block) && moved_count > 0) || disk[disk.len() - 1].eq(".") { disk.pop(); moved_count -= 1; inc_progress_bar(); }
         inc_progress_bar();
     }
     finalize_progress_bar();
