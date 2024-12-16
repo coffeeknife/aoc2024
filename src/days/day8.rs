@@ -9,45 +9,44 @@ pub fn day8(input: String) {
         while points.len() > 1 {
             let cur: (usize, usize) = points.pop().expect("Somehow there are no points?");
             for comp in &points {
-                let dif_x: usize = ((cur.0 as i64) - (comp.0 as i64)).abs() as usize;
-                let dif_y: usize = ((cur.1 as i64) - (comp.1 as i64)).abs() as usize;
-
-                let mut anti1: (usize, usize) = (0, 0);
-                let mut anti2: (usize, usize) = (0, 0);
-
-                let mut anti1_good: bool = true;
-                let mut anti2_good: bool = true;
-
-                if cur.0 > comp.0 {
-                    if cur.0 + dif_x >= dimensions.0 { anti1_good = false; }
-                    else { anti1.0 = cur.0 + dif_x; }
-                    if comp.0 < dif_x { anti2_good = false; }
-                    else { anti2.0 = comp.0 - dif_x; }
-                } else {
-                    if cur.0 < dif_x { anti1_good = false; }
-                    else { anti1.0 = cur.0 - dif_x; }
-                    if comp.0 + dif_x >= dimensions.0 { anti2_good = false; }
-                    else { anti2.0 = comp.0 - dif_x; }
+                let (anti1, anti2) = get_antinodes(cur, *comp);
+                if anti1.0 >= 0 && (anti1.0 as usize) < dimensions.0 && anti1.1 >= 0 && (anti1.1 as usize) < dimensions.1 {
+                    let a = (anti1.0 as usize, anti1.1 as usize);
+                    if !check_contains(&antinodes, &a) { antinodes.push(a); }
                 }
-
-                if cur.1 > comp.1 {
-                    if cur.1 + dif_y >= dimensions.1 { anti1_good = false; }
-                    else { anti1.1 = cur.1 + dif_y; }
-                    if comp.1 < dif_y { anti2_good = false; }
-                    else { anti2.1 = comp.1 - dif_y; }
-                } else {
-                    if cur.1 < dif_y { anti1_good = false; }
-                    else { anti1.1 = cur.1 - dif_y; }
-                    if comp.1 + dif_y >= dimensions.1 { anti2_good = false; }
-                    else { anti2.1 = comp.1 + dif_y; }
+                if anti2.0 >= 0 && (anti2.1 as usize) < dimensions.0 && anti2.1 >= 0 && (anti2.1 as usize) < dimensions.1 {
+                    let a = (anti2.0 as usize, anti2.1 as usize);
+                    if !check_contains(&antinodes, &a) { antinodes.push(a); }
                 }
-                if anti1_good && !antinodes.contains(&anti1) { antinodes.push(anti1) }
-                if anti2_good && !antinodes.contains(&anti2) { antinodes.push(anti2) }               
             }
         }
-        println!("After {key}: {:?}", antinodes);
     }
     println!("Part 1 Solution: {}", antinodes.len())
+}
+
+fn check_contains(antinodes: &Vec<(usize, usize)>, node: &(usize, usize)) -> bool {
+    for test in antinodes {
+        if test.0 == node.0 && test.1 == node.1 {
+            return true;
+        }
+    }
+    false
+}
+
+fn get_antinodes(point1: (usize, usize), point2: (usize, usize)) -> ((i64, i64), (i64, i64)) {
+    let diff_x: i64 = if point1.0 > point2.0 { point1.0 - point2.0 } else { point2.0 - point1.0 } as i64;
+    let diff_y: i64 = if point1.1 > point2.1 { point1.1 - point2.1 } else { point2.1 - point1.1 } as i64;
+
+    let node_1 = (
+        if point1.0 > point2.0 { point1.0 as i64 + diff_x } else { point1.0 as i64 - diff_x },
+        if point1.1 > point2.1 { point1.1 as i64 + diff_y } else { point1.1 as i64 - diff_y }
+    );
+    let node_2 = (
+        if point1.0 > point2.0 { point2.0 as i64 - diff_x } else { point2.0 as i64 + diff_x },
+        if point1.1 > point2.1  { point2.1 as i64 - diff_y } else { point2.1 as i64 + diff_y }
+    );
+
+    (node_1, node_2)
 }
 
 fn parse_input(input: String) -> ((usize, usize), HashMap<char, Vec<(usize, usize)>>) {
