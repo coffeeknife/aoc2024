@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 clap = { version = "4.5.23", features = ["derive"] }
+count-digits = "0.5.1"
 itertools = "0.13.0"
 lazy_static = "1.5.0"
 progress_bar = "1.0.6"
