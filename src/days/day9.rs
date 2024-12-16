@@ -17,7 +17,9 @@ pub fn day9(input: String) {
         if is_data { block_id += 1; }
         is_data = !is_data;
     }
+    let disk_orig: Vec<String> = disk.clone();
 
+    // part 1
     let original_len: usize = disk.len();
     init_progress_bar(original_len);
     set_progress_bar_action("Solving Part 1", Color::Blue, Style::Bold);
@@ -45,7 +47,55 @@ pub fn day9(input: String) {
     for i in 0..disk.len() {
         part1 += i as u64 * disk[i].parse::<u64>().expect("this shouldn't happen");
     }
-    println!("Part 1 Solution: {part1}")
+    println!("Part 1 Solution: {part1}");
+
+    let mut disk_blocks: Vec::<(String, usize)> = Vec::new();
+    let mut cur_id: String = disk_orig[0].clone();
+    let mut start_index:usize = 0;
+    for i in 1..disk_orig.len() {
+        if !disk_orig[i].eq(&cur_id) {
+            disk_blocks.push((cur_id, i - start_index));
+            start_index = i;
+            cur_id = disk_orig[i].clone();
+        }
+    }
+    disk_blocks.push((cur_id, disk_orig.len() - start_index));
+    let len_orig: usize = disk_blocks.len();
+    init_progress_bar(len_orig);
+    set_progress_bar_action("Solving Pt2", Color::Blue, Style::Bold);
+    for j in 0..len_orig {
+        inc_progress_bar();
+        let i = len_orig - j - 1;
+        let (cur, size) = disk_blocks.get(i).expect("This really shouldn't be empty").clone();
+        if cur.eq(".") { continue } // can trim any empty blocks at the end
+        let mut pushed: bool = false;
+        for k in 0..i {
+            let (testcur, testsize) = disk_blocks.get(k).expect("Shoudn't be empty").clone();
+            if testsize >= size && testcur.clone().eq(".") && !pushed {
+                disk_blocks[k] = (cur.clone(), size);
+                disk_blocks[i] = (String::from("."), size);
+                if testsize - size > 0 {
+                    disk_blocks.insert(k+1, (String::from("."), testsize - size))
+                }
+                pushed = true;
+            }
+        }
+    }
+    finalize_progress_bar();
+
+    let mut part2: u64 = 0;
+    let mut disk_string: Vec<String> = Vec::new();
+    for block in disk_blocks {
+        for _ in 0..block.1 {
+            disk_string.push(block.0.clone());
+        }
+    }
+
+    for i in 0..disk_string.len() {
+        if String::from(".").eq(&disk_string[i]) { continue }
+        part2 += disk_string[i].parse::<u64>().unwrap() * i as u64;
+    }
+    println!("Part 2 Solution: {part2}")
 }
 
 fn parse_input(input: String) -> String {
