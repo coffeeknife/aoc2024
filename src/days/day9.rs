@@ -5,100 +5,101 @@ use progress_bar::{finalize_progress_bar, inc_progress_bar, init_progress_bar, s
 
 pub fn day9(input: String) {
     println!("[RUNNING DAY 9]");
-    let fs_data: String = parse_input(input);
-    let mut disk: Vec<String> = Vec::new();
-    let mut is_data: bool = true;
-    let mut block_id: u64 = 0;
-    for char in fs_data.chars().map(|x| x.to_string().parse::<u64>().expect("Input should be all numbers")) {
-        for _ in 0..char {
-            if is_data { disk.push(block_id.to_string()); }
-            else { disk.push(String::from(".")) }
-        }
-        if is_data { block_id += 1; }
-        is_data = !is_data;
-    }
-    let disk_orig: Vec<String> = disk.clone();
+    let disk: Vec<(usize, usize)> = parse_input(input);
 
     // part 1
-    let original_len: usize = disk.len();
-    init_progress_bar(original_len);
-    set_progress_bar_action("Solving Part 1", Color::Blue, Style::Bold);
-    loop {
-        if !disk.contains(&String::from(".")) { break; }
-        let mut cur = disk.len() - 1;
-        let cur_block = disk[cur].clone();
-        while disk[cur] == cur_block && cur > 0 { cur -= 1; inc_progress_bar(); }
-        if cur == 0 { break }
-        let mut block_len = disk.len() - cur - 1;
-        let mut moved_count = 0;
-        for i in 0..disk.len() {
-            if block_len == 0 { break; }
-            if disk[i].eq(".") {
-                disk[i] = cur_block.clone();
-                block_len -= 1;
-                moved_count += 1;
+    let mut d_part1: Vec<usize> = flatten_disk(&disk);
+    let mut last_set: usize = 0;
+    let disk_len: usize = d_part1.len();
+
+    init_progress_bar(disk_len);
+    set_progress_bar_action("Solving Pt1", Color::Blue, Style::Bold);
+    for j in 1..disk_len + 1 {
+        let i: usize = disk_len - j;
+
+        if d_part1[i] == usize::MAX { inc_progress_bar(); continue }
+
+        for k in last_set..i {
+            if d_part1[k] == usize::MAX {
+                d_part1[k] = d_part1[i];
+                d_part1[i] = usize::MAX;
+                last_set = k.clone();
+                break;
             }
         }
-        while (disk[disk.len() - 1].eq(&cur_block) && moved_count > 0) || disk[disk.len() - 1].eq(".") { disk.pop(); moved_count -= 1; inc_progress_bar(); }
+        
         inc_progress_bar();
     }
     finalize_progress_bar();
-    let mut part1: u64 = 0;
-    for i in 0..disk.len() {
-        part1 += i as u64 * disk[i].parse::<u64>().expect("this shouldn't happen");
-    }
-    println!("Part 1 Solution: {part1}");
 
-    let mut disk_blocks: Vec::<(String, usize)> = Vec::new();
-    let mut cur_id: String = disk_orig[0].clone();
-    let mut start_index:usize = 0;
-    for i in 1..disk_orig.len() {
-        if !disk_orig[i].eq(&cur_id) {
-            disk_blocks.push((cur_id, i - start_index));
-            start_index = i;
-            cur_id = disk_orig[i].clone();
-        }
-    }
-    disk_blocks.push((cur_id, disk_orig.len() - start_index));
-    let len_orig: usize = disk_blocks.len();
-    init_progress_bar(len_orig);
+    println!("Part 1 Solution: {}", disk_checksum(d_part1));
+
+    // part 2
+    let mut d_part2: Vec<(usize, usize)> = disk.clone();
+    let initial_len = d_part2.len();
+
+    init_progress_bar(d_part2.len());
     set_progress_bar_action("Solving Pt2", Color::Blue, Style::Bold);
-    for j in 0..len_orig {
-        inc_progress_bar();
-        let i = len_orig - j - 1;
-        let (cur, size) = disk_blocks.get(i).expect("This really shouldn't be empty").clone();
-        if cur.eq(".") { continue } // can trim any empty blocks at the end
-        let mut pushed: bool = false;
+    
+    for j in 1..initial_len + 1{
+        let i:usize = d_part2.len() - j;
+
+        if d_part2[i].0 == usize::MAX { inc_progress_bar(); continue; }
+
         for k in 0..i {
-            let (testcur, testsize) = disk_blocks.get(k).expect("Shoudn't be empty").clone();
-            if testsize >= size && testcur.clone().eq(".") && !pushed {
-                disk_blocks[k] = (cur.clone(), size);
-                disk_blocks[i] = (String::from("."), size);
-                if testsize - size > 0 {
-                    disk_blocks.insert(k+1, (String::from("."), testsize - size))
+            if d_part2[k].0 == usize::MAX && d_part2[k].1 >= d_part2[i].1 {
+                let rem_space: usize = d_part2[k].1 - d_part2[i].1;
+                d_part2[k] = d_part2[i];
+                d_part2[i] = (usize::MAX, d_part2[i].1);
+                if rem_space != 0 {
+                    d_part2.insert(k+1, (usize::MAX, rem_space));
                 }
-                pushed = true;
             }
         }
+
+        inc_progress_bar();
     }
+
     finalize_progress_bar();
-
-    let mut part2: u64 = 0;
-    let mut disk_string: Vec<String> = Vec::new();
-    for block in disk_blocks {
-        for _ in 0..block.1 {
-            disk_string.push(block.0.clone());
-        }
-    }
-
-    for i in 0..disk_string.len() {
-        if String::from(".").eq(&disk_string[i]) { continue }
-        part2 += disk_string[i].parse::<u64>().unwrap() * i as u64;
-    }
-    println!("Part 2 Solution: {part2}")
+    println!("Part 2 Solution: {}", disk_checksum(flatten_disk(&d_part2)))
 }
 
-fn parse_input(input: String) -> String {
+fn disk_checksum(flattened: Vec<usize>) -> usize {
+    let mut checksum: usize = 0;
+    for i in 0..flattened.len() {
+        if flattened[i] == usize::MAX { continue; }
+        checksum += flattened[i] * i;
+    }
+    checksum
+}
+
+fn flatten_disk(disk: &Vec<(usize, usize)>) -> Vec<usize> {
+    let mut flattened: Vec<usize> = Vec::new();
+    for entry in disk {
+        for _ in 0..entry.1 {
+            flattened.push(entry.0)
+        }
+    }
+    flattened
+}
+
+// block with id usize::MAX is empty space
+fn parse_input(input: String) -> Vec<(usize, usize)> {
     let file: File = File::open(Path::new(&input)).expect("Err opening file");
-    BufReader::new(file).lines().flatten().join("")
+    let diskmap: Vec<usize> = BufReader::new(file).lines().flatten().join("").chars().map(|x| x.to_string().parse::<usize>().unwrap()).collect_vec();
+
+    let mut is_empty_space = false;
+    let mut cur_block_id: usize = 0;
+    let mut disk: Vec<(usize, usize)> = Vec::new();
+    for entry in diskmap {
+        if is_empty_space {
+            disk.push((usize::MAX, entry));
+        } else {
+            disk.push((cur_block_id, entry));
+            cur_block_id += 1;
+        }
+        is_empty_space = !is_empty_space
+    }
+
+    disk
 }
