@@ -3,7 +3,7 @@ use std::{fs::File, io::{BufRead, BufReader}, path::Path};
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use num::pow;
-use progress_bar::{finalize_progress_bar, inc_progress_bar, init_progress_bar, set_progress_bar_action, set_progress_bar_progress, Color, Style};
+use progress_bar::{finalize_progress_bar, init_progress_bar, set_progress_bar_action, set_progress_bar_progress, Color, Style};
 use regex::Regex;
 
 lazy_static!(
@@ -38,8 +38,18 @@ pub fn day17(input: String) {
             println!("Part 2 Solution: {i}");
             break;
         }
-        i += 1;
-        inc_progress_bar();
+
+        let mut correct_out_count: usize = 0;
+        for j in 1..program.len() + 1 {
+            if program[program.len() - j] != test_output[program.len() - j] {
+                break;
+            }
+            correct_out_count += 1;
+        }
+
+        let inc_factor = 2usize.pow(((program.len() - correct_out_count) as u32 * 3) - 3);
+        i += inc_factor;
+        set_progress_bar_progress(i - min);
     }
 }
 
