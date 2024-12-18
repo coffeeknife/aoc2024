@@ -20,13 +20,13 @@ pub fn min_path(map: &Vec<Vec<char>>, pos: (usize, usize), orig: char) -> usize 
     let this: char = map[pos.1][pos.0];
     let next_step: (usize, usize);
     let next_move: char;
-    let prev_move: char;
+    let _prev_move: char;
 
     match this {
         '^' => {
             next_step = (pos.0, pos.1 - 1);
             next_move = '<';
-            prev_move = '>';
+            _prev_move = '>';
         }
         '>' => {
             next_step = (pos.0 + 1, pos.1);
