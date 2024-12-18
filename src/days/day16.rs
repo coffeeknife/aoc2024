@@ -1,4 +1,4 @@
-use std::{cmp::min, fs::File, io::{BufRead, BufReader}, path::Path};
+use std::{fs::File, io::{BufRead, BufReader}, path::Path};
 
 pub fn day16(input: String) {
     let raw_map: Vec<Vec<char>> = parse_input(input);

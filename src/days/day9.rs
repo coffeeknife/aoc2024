@@ -34,34 +34,29 @@ pub fn day9(input: String) {
 
     println!("Part 1 Solution: {}", disk_checksum(d_part1));
 
-    // part 2
-    let mut d_part2: Vec<(usize, usize)> = disk.clone();
-    let initial_len = d_part2.len();
+    // PART 2
+    let mut disk_new: Vec<(usize, usize)> = disk.clone();
+    let mut offset: usize = 0;
 
-    init_progress_bar(d_part2.len());
+    init_progress_bar(disk_new.len());
     set_progress_bar_action("Solving Pt2", Color::Blue, Style::Bold);
-    
-    for j in 1..initial_len + 1{
-        let i:usize = d_part2.len() - j;
-
-        if d_part2[i].0 == usize::MAX { inc_progress_bar(); continue; }
-
-        for k in 0..i {
-            if d_part2[k].0 == usize::MAX && d_part2[k].1 >= d_part2[i].1 {
-                let rem_space: usize = d_part2[k].1 - d_part2[i].1;
-                d_part2[k] = d_part2[i];
-                d_part2[i] = (usize::MAX, d_part2[i].1);
-                if rem_space != 0 {
-                    d_part2.insert(k+1, (usize::MAX, rem_space));
-                }
-            }
-        }
-
+    for i in (0..disk_new.len()).rev() {
         inc_progress_bar();
+        let entry: (usize, usize) = disk_new[i+offset].clone();
+        if entry.0 == usize::MAX { continue }
+        for j in 0..i+offset {
+            let chk: (usize, usize) = disk_new[j].clone();
+            if chk.0 != usize::MAX || chk.1 < entry.1 { continue }
+            disk_new[j] = entry;
+            disk_new[i+offset] = (usize::MAX, entry.1);
+            if chk.1 > entry.1 { disk_new.insert(j+1, (usize::MAX, chk.1 - entry.1)); offset += 1; }
+            break;
+        }
     }
 
     finalize_progress_bar();
-    println!("Part 2 Solution: {}", disk_checksum(flatten_disk(&d_part2)))
+    println!("Part 2 Solution: {}", disk_checksum(flatten_disk(&disk_new)))
+
 }
 
 fn disk_checksum(flattened: Vec<usize>) -> usize {
