@@ -22,12 +22,15 @@ pub fn day17(input: String) {
     println!("Part 1 Solution: {}", output_pt1.iter().join(","));
 
     // the program handles 3 bits of A at a time until there are none left, so we can narrow our search range
-    let min: usize = 2usize.pow((program.len() as u32 * 3) - 2);
-    let max: usize = 2usize.pow((program.len() as u32 * 3) + 1);
+    let min: usize = 2usize.pow((program.len() as u32 * 3) - 3);
+    let max: usize = 2usize.pow(program.len() as u32 * 3);
+    // this is the range of outputs that produce the correct 
 
     init_progress_bar(max - min);
     set_progress_bar_action("Solving Pt2", Color::Blue, Style::Bold);
-    for i in min..max {
+
+    let mut i: usize = min;
+    while i < max {
         let test_output: Vec<usize> = run(&program, (i, 0, 0));
         if test_output.eq(&program) {
             set_progress_bar_progress(max - min);
@@ -35,6 +38,7 @@ pub fn day17(input: String) {
             println!("Part 2 Solution: {i}");
             break;
         }
+        i += 1;
         inc_progress_bar();
     }
 }
