@@ -9,7 +9,6 @@ use regex::Regex;
 lazy_static!(
     static ref REG: Regex = Regex::new(r"Register [A|B|C]: (\d+)").unwrap();
     static ref PROG: Regex = Regex::new(r"Program: ([\d|\,]+)").unwrap();
-    static ref TRIES: usize = 1000000000;
 );
 
 pub fn day17(input: String) {
@@ -22,11 +21,16 @@ pub fn day17(input: String) {
     let output_pt1: Vec<usize> = run(&program, (reg_a, reg_b, reg_c));
     println!("Part 1 Solution: {}", output_pt1.iter().join(","));
 
-    init_progress_bar(*TRIES);
-    set_progress_bar_action("Pt 2 Brute Force", Color::Blue, Style::Bold);
-    for i in 0..*TRIES {
-        if run(&program, (i, 0, 0)).eq(&program) {
-            set_progress_bar_progress(*TRIES);
+    // the program handles 3 bits of A at a time until there are none left, so we can narrow our search range
+    let min: usize = 2usize.pow((program.len() as u32 * 3) - 2);
+    let max: usize = 2usize.pow((program.len() as u32 * 3) + 1);
+
+    init_progress_bar(max - min);
+    set_progress_bar_action("Solving Pt2", Color::Blue, Style::Bold);
+    for i in min..max {
+        let test_output: Vec<usize> = run(&program, (i, 0, 0));
+        if test_output.eq(&program) {
+            set_progress_bar_progress(max - min);
             finalize_progress_bar();
             println!("Part 2 Solution: {i}");
             break;
