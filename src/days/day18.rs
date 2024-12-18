@@ -11,7 +11,7 @@ pub fn day18(input: String) {
     let coords: Vec<(usize, usize)> = parse_input(input);
     let mut mem_map: Vec<Vec<usize>> = vec![vec![MAX; SIZE]; SIZE];
 
-    // initialise dijkstra map
+    // initialise dist map
     for y in 0..SIZE {
         for x in 0..SIZE {
             if x == 0 && y == 0 { mem_map[y][x] = 0 }
