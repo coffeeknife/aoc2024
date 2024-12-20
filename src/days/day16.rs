@@ -14,7 +14,7 @@ impl Point {
     pub fn adjacent_no_opposite(&self, dir: Direction) -> Vec<(Point, Direction, usize)> {
         Direction::iter().filter(|d: &Direction| *d != dir.opposite()).map(|d: Direction| {
             let cost: usize = if dir != d { 1001 } else { 1 };
-            (d.step(self), d, cost)
+            (d.step(self).unwrap(), d, cost)
         }).collect()
     }
 }
