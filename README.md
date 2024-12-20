@@ -5,23 +5,23 @@ this project is how i'm teaching myself rust. a lot of the solutions are kind of
 
 ## problem status
 
-- `day 01:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 02:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 03:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 04:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 05:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 06:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 07:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 08:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 09:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 10:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 11:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 12:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 13:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 14:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 15:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 16:` [ ] ⭐ [ ] ⭐ - [ ] rewrite
-- `day 17:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 18:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 19:` [x] ⭐ [x] ⭐ - [ ] rewrite
-- `day 20:` [x] ⭐ [x] ⭐ - [ ] rewrite
+- `day 01:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 02:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 03:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 04:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 05:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 06:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 07:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 08:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 09:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 10:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 11:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 12:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 13:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 14:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 15:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 16:` - [ ] ⭐ - [ ] ⭐ - - [ ] rewrite
+- `day 17:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 18:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 19:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
+- `day 20:` - [x] ⭐ - [x] ⭐ - - [ ] rewrite
