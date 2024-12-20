@@ -1,28 +1,8 @@
 use std::{cmp::Ordering, collections::{BinaryHeap, HashMap, HashSet}, fs::File, io::{BufRead, BufReader}, path::Path};
 
-use strum::{EnumIter, IntoEnumIterator};
+use strum::IntoEnumIterator;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, EnumIter)]
-enum Direction { Up, Down, Left, Right }
-impl Direction {
-    fn step(&self, pt: &Point) -> Point {
-        match self {
-            Direction::Up => Point::new(pt.x, pt.y - 1),
-            Direction::Left => Point::new(pt.x - 1, pt.y),
-            Direction::Down => Point::new(pt.x, pt.y + 1),
-            Direction::Right => Point::new(pt.x + 1, pt.y)
-        }
-    }
-
-    fn opposite(&self) -> Self {
-        match self {
-            Direction::Up => Direction::Down,
-            Direction::Down => Direction::Up,
-            Direction::Left => Direction::Right,
-            Direction::Right => Direction::Left
-        }
-    }
-}
+use crate::common::{map::{Direction, Point}, maze::Map};
 
 #[derive(Debug, Eq, PartialEq, Hash)]
 struct Step { pos: Point, dir: Direction, score: usize, path: Vec<Point> }
@@ -30,24 +10,13 @@ impl Step { fn new(pos: Point, dir: Direction, score: usize, path: Vec<Point>) -
 impl Ord for Step { fn cmp(&self, other: &Self) -> Ordering { other.score.cmp(&self.score) } }
 impl PartialOrd for Step { fn partial_cmp(&self, other: &Self) -> Option<Ordering> { Some(self.cmp(other)) } }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-struct Point { x: usize, y: usize }
-impl Point { 
-    fn new(x: usize, y: usize ) -> Self { Self { x, y } } 
-
-    fn adjacent(&self, dir: Direction) -> Vec<(Point, Direction, usize)> {
+impl Point {
+    pub fn adjacent_no_opposite(&self, dir: Direction) -> Vec<(Point, Direction, usize)> {
         Direction::iter().filter(|d: &Direction| *d != dir.opposite()).map(|d: Direction| {
             let cost: usize = if dir != d { 1001 } else { 1 };
             (d.step(self), d, cost)
         }).collect()
     }
-}
-
-#[derive(Debug, Clone)]
-struct Map {
-    spaces: HashSet<Point>,
-    start: Point,
-    end: Point
 }
 
 impl Map {
@@ -74,7 +43,7 @@ impl Map {
     }
 
     fn adjacent(&self, pt: Point, dir: Direction) -> Vec<(Point, Direction, usize)> {
-        pt.adjacent(dir).into_iter().filter(|(p, _, _)| self.spaces.contains(p)).collect()
+        pt.adjacent_no_opposite(dir).into_iter().filter(|(p, _, _)| self.spaces.contains(p)).collect()
     }
 
     fn shortest_paths(&self) -> (usize, Vec<Point>) {
@@ -116,7 +85,6 @@ pub fn day16(input: String) {
 
     let (shortest, tiles) = in_map.shortest_paths();
     println!("Part 1: {}", shortest);
-
     println!("Part 2: {}", tiles.len());
 }
 

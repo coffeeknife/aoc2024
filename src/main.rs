@@ -3,6 +3,7 @@ use std::time::Instant;
 use clap::Parser;
 
 mod days;
+mod common;
 
 #[derive(Parser)]
 struct Cli {
