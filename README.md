@@ -20,7 +20,7 @@ this project is how i'm teaching myself rust. a lot of the solutions are kind of
 - `day 13:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
 - `day 14:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
 - `day 15:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
-- `day 16:` &#x2611; ⭐ &#x2610; ⭐ - &#x2610; rewrite
+- `day 16:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
 - `day 17:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
 - `day 18:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
 - `day 19:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
