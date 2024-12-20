@@ -1,4 +1,6 @@
-use std::{fs::File, io::{BufRead, BufReader}, path::Path};
+use std::{collections::HashMap, fs::File, io::{BufRead, BufReader}, path::Path};
+
+use itertools::Itertools;
 
 pub fn day16(input: String) {
     let start_map: Vec<Vec<char>> = parse_input(input);
@@ -12,13 +14,17 @@ pub fn day16(input: String) {
             else if start_map[y][x] == 'E' { goal = (x, y) }
         }
     }
+
+    let mut cached_scores: HashMap<((usize, usize), char), usize> = HashMap::new();
     
-    println!("Part 1 Solution: {}", lowest_score(&start, &goal, &mut start_map.clone(), '>'));
+    println!("Part 1 Solution: {}", lowest_score(&start, &goal, &mut start_map.clone(), '>', &mut cached_scores));
 }
 
 // recursive pathfinding function
-fn lowest_score(pos: &(usize, usize), goal: &(usize, usize), test_map: &mut Vec<Vec<char>>, dir: char) -> usize {
-    if pos.eq(goal) { return 0 }
+fn lowest_score(pos: &(usize, usize), goal: &(usize, usize), test_map: &mut Vec<Vec<char>>, dir: char, cache: &mut HashMap<((usize, usize), char), usize>) -> usize {
+    if pos.eq(goal) { 
+        return 0 
+    }
 
     test_map[pos.1][pos.0] = 'X';
 
@@ -30,28 +36,45 @@ fn lowest_score(pos: &(usize, usize), goal: &(usize, usize), test_map: &mut Vec<
 
     // test going up
     if get_point(&test_map, (pos.0 as i32, pos.1 as i32 - 1)) == '.' {
-        scores.push(safe_add(get_motion_cost(dir, '^'), lowest_score(&(pos.0, pos.1 - 1), goal, &mut test_map_2, '^')))
+        if cache.keys().contains(&((pos.0, pos.1 - 1), '^')) {scores.push(*cache.get(&((pos.0, pos.1 - 1), '^')).unwrap());}
+        else { 
+            let score: usize = safe_add(get_motion_cost(dir, '^'), lowest_score(&(pos.0, pos.1 - 1), goal, &mut test_map_2, '^', cache));
+            cache.insert(((pos.0, pos.1 - 1), '^'), score);
+            scores.push(score); 
+        }
     }
 
     // test going left
     if get_point(&test_map, (pos.0 as i32 - 1, pos.1 as i32)) == '.' {
-        scores.push(safe_add(get_motion_cost(dir, '<'), lowest_score(&(pos.0 - 1, pos.1), goal, &mut test_map_2, '<')))
+        if cache.keys().contains(&((pos.0 - 1, pos.1), '<')) {scores.push(*cache.get(&((pos.0 - 1, pos.1), '<')).unwrap())}
+        else { 
+            let score: usize = safe_add(get_motion_cost(dir, '<'), lowest_score(&(pos.0 - 1, pos.1), goal, &mut test_map_2, '<', cache));
+            cache.insert(((pos.0 - 1, pos.1), '<'), score);
+            scores.push(score) 
+        }
     }
 
     // test going down
     if get_point(&test_map, (pos.0 as i32, pos.1 as i32 + 1)) == '.' {
-        scores.push(safe_add(get_motion_cost(dir, 'v'), lowest_score(&(pos.0, pos.1 + 1), goal, &mut test_map_2, 'v')))
+        if cache.keys().contains(&((pos.0, pos.1 + 1), 'v')) {scores.push(*cache.get(&((pos.0, pos.1 + 1), 'v')).unwrap())}
+        else { 
+            let score: usize = safe_add(get_motion_cost(dir, 'v'), lowest_score(&(pos.0, pos.1 + 1), goal, &mut test_map_2, 'v', cache));
+            cache.insert(((pos.0, pos.1 + 1), 'v'), score);
+            scores.push(score); 
+        }
     }
 
     // test going right
     if get_point(&test_map, (pos.0 as i32 + 1, pos.1 as i32)) == '.' {
-        scores.push(safe_add(get_motion_cost(dir, '>'), lowest_score(&(pos.0 + 1, pos.1), goal, &mut test_map_2, '>')))
+        if cache.keys().contains(&((pos.0 + 1, pos.1), '>')) {scores.push(*cache.get(&((pos.0 + 1, pos.1), '>')).unwrap())}
+        else { 
+            let score: usize = safe_add(get_motion_cost(dir, '>'), lowest_score(&(pos.0 + 1, pos.1), goal, &mut test_map_2, '>', cache));
+            cache.insert(((pos.0 + 1, pos.1), '>'), score);
+            scores.push(score);
+        }
     }
 
     let score: usize = *scores.iter().min().unwrap();
-    if score == usize::MAX {
-        test_map[pos.1][pos.0] = '#';
-    }
     score
 }
 
