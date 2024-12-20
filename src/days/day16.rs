@@ -1,64 +1,74 @@
 use std::{fs::File, io::{BufRead, BufReader}, path::Path};
 
 pub fn day16(input: String) {
-    let raw_map: Vec<Vec<char>> = parse_input(input);
-    let mut weight_map: Vec<Vec<(usize, char)>> = vec![vec![(usize::MAX - 1, '.'); raw_map[0].len()]; raw_map.len()];
+    let start_map: Vec<Vec<char>> = parse_input(input);
 
     let mut start: (usize, usize) = (0,0);
     let mut goal: (usize, usize) = (0,0);
 
-    for y in 0..raw_map.len() {
-        for x in 0..raw_map[0].len() {
-            let raw: char = raw_map[y][x];
-            match raw {
-                'S' => {start = (x, y); weight_map[y][x] = (0, '>')},
-                '#' => weight_map[y][x] = (usize::MAX, '#'),
-                'E' => {goal = (x, y); weight_map[y][x] = (usize::MAX - 1, 'E')}
-                _ => continue
-            }
+    for y in 0..start_map.len() {
+        for x in 0..start_map[0].len() {
+            if start_map[y][x] == 'S' { start = (x, y) }
+            else if start_map[y][x] == 'E' { goal = (x, y) }
         }
     }
-
-    for pt in get_adjacent(start, (weight_map[0].len(), weight_map.len())) {
-        cascade_update(&mut weight_map, pt);
-    }
-
-    println!("Part 1 Solution: {}", weight_map[goal.1][goal.0].0);
+    
+    println!("Part 1 Solution: {}", lowest_score(&start, &goal, &mut start_map.clone(), '>'));
 }
 
-fn cascade_update(map: &mut Vec<Vec<(usize, char)>>, pt: (usize, usize)) {
-    let cur_cost: usize = map[pt.1][pt.0].0;
-    let cur_char: char = map[pt.1][pt.0].1;
-    if cur_char == '#' {return} // don't touch walls
-    let mut cost_candidates: Vec<(usize, char)> = vec![(usize::MAX, '*')];
-    for adj in get_adjacent(pt, (map[0].len(), map.len())) {
-        let mut price: usize = map[adj.1][adj.0].0;
-        let dir: char = map[adj.1][adj.0].1;
-        if adj.0 < pt.0 { // [adj] > [pt]
-            if price < usize::MAX - 2001 { price += get_motion_cost('>', dir ) }
-            cost_candidates.push((price, '>'))
-        } else if adj.0 > pt.0 { // [pt] < [adj]
-            if price < usize::MAX - 2001 { price += get_motion_cost('<', dir) }
-            cost_candidates.push((price, '<'))
-        } else if adj.1 < pt.1 { // [adj] v/ [pt]
-            if price < usize::MAX - 2001 { price += get_motion_cost('v', dir) }
-            cost_candidates.push((price, 'v'))
-        } else { // [pt] /^ [adj]
-            if price < usize::MAX - 2001 { price += get_motion_cost('^', dir) }
-            cost_candidates.push((price, '^'))
-        }
+// recursive pathfinding function
+fn lowest_score(pos: &(usize, usize), goal: &(usize, usize), test_map: &mut Vec<Vec<char>>, dir: char) -> usize {
+    if pos.eq(goal) { return 0 }
+
+    test_map[pos.1][pos.0] = 'X';
+
+    _print_map(test_map);
+
+    let mut test_map_2: Vec<Vec<char>> = test_map.clone();
+
+    let mut scores: Vec<usize> = vec![usize::MAX];
+
+    // test going up
+    if get_point(&test_map, (pos.0 as i32, pos.1 as i32 - 1)) == '.' {
+        scores.push(safe_add(get_motion_cost(dir, '^'), lowest_score(&(pos.0, pos.1 - 1), goal, &mut test_map_2, '^')))
     }
 
-    let mut best_cost: (usize, char) = (usize::MAX, '*');
-    for cost in cost_candidates {
-        if cost.0 < best_cost.0 {
-            best_cost = cost;
+    // test going left
+    if get_point(&test_map, (pos.0 as i32 - 1, pos.1 as i32)) == '.' {
+        scores.push(safe_add(get_motion_cost(dir, '<'), lowest_score(&(pos.0 - 1, pos.1), goal, &mut test_map_2, '<')))
+    }
+
+    // test going down
+    if get_point(&test_map, (pos.0 as i32, pos.1 as i32 + 1)) == '.' {
+        scores.push(safe_add(get_motion_cost(dir, 'v'), lowest_score(&(pos.0, pos.1 + 1), goal, &mut test_map_2, 'v')))
+    }
+
+    // test going right
+    if get_point(&test_map, (pos.0 as i32 + 1, pos.1 as i32)) == '.' {
+        scores.push(safe_add(get_motion_cost(dir, '>'), lowest_score(&(pos.0 + 1, pos.1), goal, &mut test_map_2, '>')))
+    }
+
+    let score: usize = *scores.iter().min().unwrap();
+    if score == usize::MAX {
+        test_map[pos.1][pos.0] = '#';
+    }
+    score
+}
+
+// debug function
+fn _print_map(map: &Vec<Vec<char>>) {
+    for line in map {
+        for entry in line {
+            print!("{entry}")
         }
+        print!{"\n"};
     }
-    if best_cost.0 != cur_cost || best_cost.1 != cur_char {
-        map[pt.1][pt.0] = best_cost;
-        for new in get_adjacent(pt, (map[0].len(), map.len())) { cascade_update(map, new); }
-    }
+}
+
+// add without overflowing
+fn safe_add(a:usize, b:usize) -> usize {
+    if usize::MAX - a < b || usize::MAX - b < a { usize::MAX }
+    else { a + b }
 }
 
 fn get_motion_cost(a: char, b: char) -> usize {
@@ -67,13 +77,13 @@ fn get_motion_cost(a: char, b: char) -> usize {
     else { 1001 }
 }
 
-fn get_adjacent(pt: (usize, usize), dim: (usize, usize)) -> Vec<(usize, usize)> {
-    let mut adj: Vec<(usize, usize)> = Vec::new();
-    if pt.0 > 0 { adj.push((pt.0 - 1, pt.1)) }
-    if pt.1 > 0 { adj.push((pt.0, pt.1 - 1)) }
-    if pt.0 < dim.0 - 1 { adj.push((pt.0 + 1, pt.1)) }
-    if pt.1 < dim.1 - 1 { adj.push((pt.0, pt.1 + 1)) }
-    adj
+// safely get point or bogus value if out of bounds
+fn get_point(map: &Vec<Vec<char>>, pt: (i32, i32)) -> char {
+    if pt.0 < 0 || pt.0 >= map[0].len() as i32 || pt.1 < 0 || pt.1 >= map.len() as i32 { '#' }
+    else {
+        let res =  map[pt.1 as usize][pt.0 as usize];
+        if res == 'E' { '.' } else { res }
+    }
 }
 
 
