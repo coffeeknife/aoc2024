@@ -8,7 +8,6 @@ lazy_static! {
 }
 
 pub fn day4(input: String) {
-    println!("[RUNNING DAY 4]");
     let wordsearch = parse_input(input);
     let mut part1: u64 = 0;
     let mut part2: u64 = 0;

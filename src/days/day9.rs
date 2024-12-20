@@ -4,7 +4,6 @@ use itertools::Itertools;
 use progress_bar::{finalize_progress_bar, inc_progress_bar, init_progress_bar, set_progress_bar_action, Color, Style};
 
 pub fn day9(input: String) {
-    println!("[RUNNING DAY 9]");
     let disk: Vec<(usize, usize)> = parse_input(input);
 
     // part 1

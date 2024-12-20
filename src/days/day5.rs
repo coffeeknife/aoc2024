@@ -1,7 +1,6 @@
 use std::{collections::HashMap, fs::File, io::{BufRead, BufReader}, path::Path};
 
 pub fn day5(input: String) {
-    println!("[RUNNING DAY 5]");
     let (order_rules, updates) = parse_input(input);
     let mut part1: u64 = 0;
     let mut part2: u64 = 0;

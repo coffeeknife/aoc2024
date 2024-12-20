@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use clap::Parser;
 
 mod days;
@@ -9,7 +11,11 @@ struct Cli {
 }
 
 fn main() {
-    let args = Cli::parse();
+    let args: Cli = Cli::parse();
+
+    println!("[RUNNING DAY {}]", args.day);
+    let start: Instant = Instant::now();
+
     match args.day {
         1 => days::day1::day1(args.input),
         2 => days::day2::day2(args.input),
@@ -35,4 +41,6 @@ fn main() {
             println!("Day not recognized or implemented");
         }
     }
+
+    println!("Day {} executed in {}ms", args.day, start.elapsed().as_millis());
 }

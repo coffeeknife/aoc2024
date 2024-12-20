@@ -3,7 +3,6 @@ use std::{collections::HashMap, fs::File, io::{BufRead, BufReader}, path::Path};
 use itertools::Itertools;
 
 pub fn day7(input: String) {
-    println!("[RUNNING DAY 7]");
     let data: HashMap<u64, Vec<u64>> = parse_input(input);
     let mut part1: u64 = 0;
     let mut part2: u64 = 0;

@@ -1,7 +1,6 @@
 use std::{fs::File, io::{BufRead, BufReader}, path::Path};
 
 pub fn day2(input: String) {
-    println!("[RUNNING DAY 2]");
     let reports = parse_input(input);
     let mut part1: u64 = 0;
     let mut part2: u64 = 0;

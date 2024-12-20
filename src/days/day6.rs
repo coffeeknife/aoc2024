@@ -4,7 +4,6 @@ use std::{fs::File, io::{BufRead, BufReader}, path::Path};
 use progress_bar::{finalize_progress_bar, inc_progress_bar, init_progress_bar, set_progress_bar_action, Color, Style};
 
 pub fn day6(input: String) {
-    println!("[RUNNING DAY 6]");
     let mut map: Vec<Vec<char>> = parse_input(input);
     let map_original: Vec<Vec<char>> = map.clone();
     let (mut guard_x, mut guard_y) = find_guard(&map);

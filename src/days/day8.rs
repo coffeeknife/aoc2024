@@ -1,7 +1,6 @@
 use std::{collections::HashMap, fs::File, io::{BufRead, BufReader}, path::Path};
 
 pub fn day8(input: String) {  // TODO rewrite by just recording inside the string like day 6
-    println!("[RUNNING DAY 8]");
     let (dimensions, antennae) = parse_input(input);
     let mut anode_map: Vec<Vec<bool>> = vec![vec![false; dimensions.0]; dimensions.1];
 
