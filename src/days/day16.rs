@@ -1,8 +1,8 @@
-use std::{cmp::Ordering, collections::{BinaryHeap, HashMap, HashSet}, fs::File, io::{BufRead, BufReader}, path::Path};
+use std::{cmp::Ordering, collections::{BinaryHeap, HashMap}, fs::File, io::{BufRead, BufReader}, path::Path};
 
 use strum::IntoEnumIterator;
 
-use crate::common::{map::{Direction, Point}, maze::Map};
+use crate::common::{map::{Direction, Point}, maze::MazeMap};
 
 #[derive(Debug, Eq, PartialEq, Hash)]
 struct Step { pos: Point, dir: Direction, score: usize, path: Vec<Point> }
@@ -19,30 +19,8 @@ impl Point {
     }
 }
 
-impl Map {
-    fn new(in_map: Vec<Vec<char>>) -> Self {
-        let mut spaces: HashSet<Point> = HashSet::new();
-        let mut start: Point = Point { x: 0, y: 0 };
-        let mut end: Point = Point { x: 0, y: 0 };
-
-        for y in 0..in_map.len() {
-            for x in 0..in_map[0].len() {
-                if in_map[y][x] == 'S' {
-                    start = Point { x, y };
-                } else if in_map[y][x] == 'E' {
-                    end = Point { x, y };
-                }
-                
-                if in_map[y][x] != '#' {
-                    spaces.insert(Point { x, y });
-                }
-            }
-        }
-
-        Self { spaces, start, end }
-    }
-
-    fn adjacent(&self, pt: Point, dir: Direction) -> Vec<(Point, Direction, usize)> {
+impl MazeMap {
+    fn adjacent_no_opposite(&self, pt: Point, dir: Direction) -> Vec<(Point, Direction, usize)> {
         pt.adjacent_no_opposite(dir).into_iter().filter(|(p, _, _)| self.spaces.contains(p)).collect()
     }
 
@@ -69,7 +47,7 @@ impl Map {
                 shortest = score; 
             }
             
-            for (adj, dir_new, move_cost) in self.adjacent(pos, dir) {
+            for (adj, dir_new, move_cost) in self.adjacent_no_opposite(pos, dir) {
                 let mut path_new = path.clone();
                 path_new.push(adj);
                 queue.push(Step::new(adj, dir_new, score + move_cost, path_new));
@@ -81,7 +59,7 @@ impl Map {
 }
 
 pub fn day16(input: String) {
-    let in_map: Map = Map::new(parse_input(input));
+    let in_map: MazeMap = MazeMap::new(parse_input(input));
 
     let (shortest, tiles) = in_map.shortest_paths();
     println!("Part 1: {}", shortest);
