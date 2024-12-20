@@ -25,8 +25,8 @@ impl Direction {
 }
 
 #[derive(Debug, Eq, PartialEq, Hash)]
-struct Step { pos: Point, dir: Direction, score: usize }
-impl Step { fn new(pos: Point, dir: Direction, score: usize) -> Self { Self { pos, dir, score } } }
+struct Step { pos: Point, dir: Direction, score: usize, path: Vec<Point> }
+impl Step { fn new(pos: Point, dir: Direction, score: usize, path: Vec<Point>) -> Self { Self { pos, dir, score, path } } }
 impl Ord for Step { fn cmp(&self, other: &Self) -> Ordering { other.score.cmp(&self.score) } }
 impl PartialOrd for Step { fn partial_cmp(&self, other: &Self) -> Option<Ordering> { Some(self.cmp(other)) } }
 
@@ -77,35 +77,47 @@ impl Map {
         pt.adjacent(dir).into_iter().filter(|(p, _, _)| self.spaces.contains(p)).collect()
     }
 
-    fn shortest_path(&self) -> usize {
+    fn shortest_paths(&self) -> (usize, Vec<Point>) {
         let mut shortest: usize = usize::MAX;
+        let mut unique_tiles: Vec<Point> = Vec::new();
         let mut cache: HashMap<(Point, Direction), usize> = HashMap::new();
 
         // thank you internet for teaching me how to do binary searches
         let mut queue: BinaryHeap<Step> = BinaryHeap::new();
-        queue.push(Step::new(self.start, Direction::Right, 0));
+        queue.push(Step::new(self.start, Direction::Right, 0, vec![self.start]));
 
-        while let Some(Step { pos, dir, score }) = queue.pop() {
+        while let Some(Step { pos, dir, score , path}) = queue.pop() {
             if let Some(&prev_score) = cache.get(&(pos, dir)) {
                 if score > prev_score { continue }
             } else { cache.insert((pos, dir), score); }
 
-            if pos == self.end && score < shortest { 
+            if pos == self.end && score <= shortest { 
+                for step in &path {
+                    if !unique_tiles.contains(step) {
+                        unique_tiles.push(step.clone())
+                    }
+                }
                 shortest = score; 
             }
             
             for (adj, dir_new, move_cost) in self.adjacent(pos, dir) {
-                queue.push(Step::new(adj, dir_new, score + move_cost));
+                let mut path_new = path.clone();
+                path_new.push(adj);
+                queue.push(Step::new(adj, dir_new, score + move_cost, path_new));
             }
         }
 
-        shortest
+        (shortest, unique_tiles)
     }
 }
 
 pub fn day16(input: String) {
     let in_map: Map = Map::new(parse_input(input));
-    println!("Part 1: {}", in_map.shortest_path());
+
+    let (shortest, tiles) = in_map.shortest_paths();
+    println!("Part 1: {}", shortest);
+
+    println!("Part 2: {}", tiles.len());
 }
 
 fn parse_input(input: String) -> Vec<Vec<char>> {
