@@ -35,3 +35,4 @@ this project is how i'm teaching myself rust. a lot of the solutions are kind of
     - **day 19 is slow: runtime of 20.538s**
 - `day 20:` &#x2611; ⭐ &#x2611; ⭐ - &#x2610; rewrite
     - **day 20 is slow: runtime of 7.771s**
+- `day 21:` &#x2610; ⭐ &#x2610; ⭐
